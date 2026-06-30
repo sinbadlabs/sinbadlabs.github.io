@@ -1,0 +1,118 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 18px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  color: #1a1a1a;
+  background: #fafaf9;
+}
+
+main {
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+}
+
+.hero {
+  margin-bottom: 3rem;
+}
+
+h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.tagline {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  color: #333;
+}
+
+.subtext {
+  margin: 0;
+  font-size: 1rem;
+  color: #666;
+}
+
+section {
+  margin-bottom: 2.5rem;
+}
+
+h2 {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #666;
+}
+
+h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+.product {
+  padding: 1.25rem 0 0;
+  border-top: 1px solid #e5e5e4;
+}
+
+.product-note {
+  color: #666;
+  font-size: 0.9375rem;
+}
+
+a {
+  color: #1a1a1a;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: #555;
+}
+
+footer {
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+  font-size: 0.875rem;
+  color: #999;
+}
+
+footer p {
+  margin: 0;
+  border-top: 1px solid #e5e5e4;
+  padding-top: 1.5rem;
+}
+
+@media (min-width: 600px) {
+  main {
+    padding-top: 5rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+}
