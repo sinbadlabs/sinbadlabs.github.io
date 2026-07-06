@@ -27,6 +27,16 @@ main {
   margin-bottom: 3rem;
 }
 
+.hero-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 1.5rem;
+  border: 1px solid #e5e5e4;
+  border-radius: 8px;
+  background: #f1f0ed;
+}
+
 h1 {
   margin: 0 0 0.75rem;
   font-size: 1.75rem;
@@ -115,7 +125,7 @@ p:last-child {
 
 .screenshot-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
   gap: 1rem;
 }
 
@@ -139,6 +149,16 @@ p:last-child {
   object-fit: cover;
   overflow: hidden;
   text-align: center;
+}
+
+.screenshot-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 236 / 164;
+  border: 1px solid #e5e5e4;
+  border-radius: 8px;
+  background: #f1f0ed;
 }
 
 .screenshot-label {
