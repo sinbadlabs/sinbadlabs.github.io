@@ -152,6 +152,20 @@ p:last-child {
   font-size: 0.9375rem;
 }
 
+.faq-list {
+  border-top: 1px solid #e5e5e4;
+}
+
+.faq-item {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid #e5e5e4;
+}
+
+.faq-item p {
+  color: #555;
+  font-size: 0.9375rem;
+}
+
 .screenshot-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
