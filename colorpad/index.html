@@ -21,6 +21,7 @@
   <meta name="twitter:description" content="A coloring app designed to reduce interruptions so children can stay immersed in creating.">
   <meta name="twitter:image" content="https://sinbadlabs.com/colorpad/screenshots/hero.webp">
   <meta name="twitter:image:alt" content="ColorPad gallery with coloring pages and a recently finished picture.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../style.css">
   <script type="application/ld+json">
   {
@@ -46,10 +47,13 @@
   </script>
 </head>
 <body>
-  <main>
-    <p>
-      <a class="back-link" href="/">Back to Sinbad Labs</a>
-    </p>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <main id="content">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Sinbad Labs</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">ColorPad</span>
+    </nav>
 
     <header class="hero">
       <h1>ColorPad</h1>
@@ -198,12 +202,13 @@
 
     <section id="links">
       <h2>Links</h2>
-      <p class="cta">
+      <nav class="product-nav" aria-label="ColorPad links">
+        <a aria-current="page" href="/colorpad/">Product</a>
         <a href="/colorpad/support/">Support</a>
-        <a href="/privacy/colorpad.html">Privacy Policy</a>
-        <a href="/terms/colorpad.html">Terms of Service</a>
+        <a href="/colorpad/privacy/">Privacy</a>
+        <a href="/colorpad/terms/">Terms</a>
         <a href="mailto:hello@sinbadlabs.com">Contact</a>
-      </p>
+      </nav>
     </section>
   </main>
 

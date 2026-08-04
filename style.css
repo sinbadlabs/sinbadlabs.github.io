@@ -17,6 +17,23 @@ body {
   background: #fafaf9;
 }
 
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 10;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #1a1a1a;
+  color: #fff;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  color: #fff;
+  transform: translateY(0);
+}
+
 main {
   max-width: 36rem;
   margin: 0 auto;
@@ -25,6 +42,19 @@ main {
 
 .hero {
   margin-bottom: 3rem;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 2rem;
+  color: #777;
+  font-size: 0.875rem;
+}
+
+.breadcrumb a {
+  color: #555;
 }
 
 .hero-image {
@@ -226,6 +256,43 @@ p:last-child {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1rem;
+}
+
+.product-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+}
+
+.product-nav [aria-current="page"] {
+  color: #666;
+  text-decoration: none;
+}
+
+.legal-page header {
+  margin-bottom: 2.5rem;
+}
+
+.legal-page section {
+  margin-bottom: 2rem;
+}
+
+.legal-page h2 {
+  font-size: 1rem;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  color: #222;
+}
+
+.legal-meta {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.redirect-page {
+  min-height: 70vh;
+  display: grid;
+  align-content: center;
 }
 
 a {

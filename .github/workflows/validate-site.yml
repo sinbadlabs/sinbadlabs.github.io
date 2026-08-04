@@ -1,0 +1,17 @@
+name: Validate site
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  links-and-structure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Validate local links and HTML structure
+        run: python3 scripts/check_links.py
