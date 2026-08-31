@@ -46,55 +46,64 @@
   }
   </script>
 </head>
-<body>
+<body class="product-page">
   <a class="skip-link" href="#content">Skip to content</a>
-  <main id="content">
+  <main id="content" class="product-shell">
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a href="/">Sinbad Labs</a>
       <span aria-hidden="true">/</span>
       <span aria-current="page">Happy ColorPad</span>
     </nav>
 
-    <header class="hero">
-      <h1>Happy ColorPad</h1>
-      <p class="tagline">Bring your own pictures. Make them yours.</p>
-      <p class="subtext">
-        A simple, relaxing coloring app for iPhone and iPad. Choose from 190+
-        hand-drawn coloring pages, or import your own line art from Photos.
-      </p>
-      <p class="hero-cta">
-        <a class="primary-cta" href="https://apps.apple.com/us/app/happy-colorpad/id6768400422">Download on the App Store</a>
-      </p>
-      <p class="product-note">
-        No ads · 190+ coloring pages · Import from Photos
-      </p>
-      <img
-        class="hero-image"
-        src="screenshots/hero.webp"
-        alt="Happy ColorPad gallery with coloring pages and a recently finished picture."
-        width="2360"
-        height="1640"
-        fetchpriority="high"
-      >
+    <header class="product-hero">
+      <div class="product-hero-copy">
+        <p class="eyebrow">A calmer way to create</p>
+        <h1>Happy<br><span>ColorPad</span></h1>
+        <p class="product-hero-tagline">Bring your own pictures.<br>Make them yours.</p>
+        <p class="product-hero-summary">
+          A simple, relaxing coloring app for iPhone and iPad—with 190+ hand-drawn
+          pages and the freedom to import line art from Photos.
+        </p>
+        <div class="button-row">
+          <a class="primary-cta" href="https://apps.apple.com/us/app/happy-colorpad/id6768400422">Download on the App Store <span aria-hidden="true">↗</span></a>
+        </div>
+        <p class="product-note">No ads <span>·</span> Private by design <span>·</span> Made for touch</p>
+      </div>
+      <div class="product-hero-visual">
+        <span class="hero-spark hero-spark-one" aria-hidden="true">✦</span>
+        <span class="hero-spark hero-spark-two" aria-hidden="true">✦</span>
+        <img
+          src="screenshots/hero.webp"
+          alt="Happy ColorPad gallery with coloring pages and a recently finished picture."
+          width="2360"
+          height="1640"
+          fetchpriority="high"
+        >
+        <p><strong>190+</strong><span>pages ready<br>to color</span></p>
+      </div>
     </header>
 
-    <section id="why-colorpad">
-      <h2>Coloring should not feel like managing software.</h2>
-      <p>
-        Children open a coloring app because they want to create. They should not
-        have to work through complicated menus, switch between collections, or
-        constantly adjust settings before they can continue.
-      </p>
-      <p>
-        Happy ColorPad keeps the experience clear and approachable so the app can stay in
-        the background and creativity can remain in the foreground.
-      </p>
+    <section id="why-colorpad" class="editorial-section intro-section">
+      <div class="section-label"><h2>Made for the moment</h2></div>
+      <div class="intro-grid">
+        <p class="section-statement">Coloring should feel like coloring—not managing software.</p>
+        <div>
+          <p>
+            Children open a coloring app because they want to create. They should not
+            have to work through complicated menus or constantly adjust settings.
+          </p>
+          <p>
+            Happy ColorPad stays clear and approachable, so the interface can fade
+            into the background and creativity can stay in the foreground.
+          </p>
+        </div>
+      </div>
     </section>
 
-    <section id="features">
-      <h2>Made to reduce interruptions</h2>
+    <section id="features" class="editorial-section features-section">
+      <div class="section-label"><h2>Everything they need</h2></div>
       <ul class="feature-list">
-        <li class="feature-card">
+        <li class="feature-card feature-card-primary">
           <h3>Color the pictures you already love</h3>
           <p>
             Bring your own line art into Happy ColorPad directly from Photos. Drawings,
@@ -139,22 +148,10 @@
       </ul>
     </section>
 
-    <section id="for-families">
-      <h2>Creative screen time for children and parents</h2>
-      <p>
-        Happy ColorPad gives children an approachable place to create while giving parents
-        a quieter alternative to fast, high-stimulation entertainment.
-      </p>
-      <p>
-        Parents can also bring in line art their child already loves, turning familiar
-        characters, interests, or family-made drawings into new coloring pages.
-      </p>
-    </section>
-
-    <section id="screenshots">
-      <h2>Screenshots</h2>
+    <section id="screenshots" class="editorial-section screenshots-section">
+      <div class="section-label"><h2>Inside Happy ColorPad</h2></div>
       <div class="screenshot-grid">
-        <figure>
+        <figure class="screenshot-main">
           <img
             class="screenshot-image"
             src="screenshots/gallery.webp"
@@ -163,7 +160,7 @@
             height="1640"
             loading="lazy"
           >
-          <figcaption>Choose a page and start creating</figcaption>
+          <figcaption><span>Gallery</span> Choose a page and start creating</figcaption>
         </figure>
         <figure>
           <img
@@ -174,7 +171,7 @@
             height="1640"
             loading="lazy"
           >
-          <figcaption>Simple tools keep coloring in focus</figcaption>
+          <figcaption><span>Canvas</span> Simple tools keep coloring in focus</figcaption>
         </figure>
         <figure>
           <img
@@ -185,23 +182,36 @@
             height="1640"
             loading="lazy"
           >
-          <figcaption>Find colors without leaving the canvas</figcaption>
+          <figcaption><span>Palette</span> Find colors without leaving the canvas</figcaption>
         </figure>
       </div>
     </section>
 
-    <section id="get-happy-colorpad">
-      <h2>Get Happy ColorPad</h2>
-      <p>
-        Happy ColorPad is available on the App Store for iPhone and iPad.
-      </p>
-      <p class="hero-cta">
-        <a class="primary-cta" href="https://apps.apple.com/us/app/happy-colorpad/id6768400422">Get Happy ColorPad</a>
-      </p>
+    <section id="for-families" class="family-panel">
+      <p class="eyebrow">For children—and the grown-ups who love them</p>
+      <h2>Creative screen time<br>that feels different.</h2>
+      <div class="family-copy">
+        <p>
+          A quieter alternative to fast, high-stimulation entertainment, with no ads
+          pulling children away from what they are making.
+        </p>
+        <p>
+          Bring in line art they already love and turn familiar interests or family-made
+          drawings into something new.
+        </p>
+      </div>
     </section>
 
-    <section id="links">
-      <h2>Links</h2>
+    <section id="get-happy-colorpad" class="download-panel">
+      <div>
+        <p class="eyebrow">Ready when inspiration arrives</p>
+        <h2>Pick a picture.<br>Make it yours.</h2>
+      </div>
+      <a class="primary-cta primary-cta-light" href="https://apps.apple.com/us/app/happy-colorpad/id6768400422">Get Happy ColorPad <span aria-hidden="true">↗</span></a>
+    </section>
+
+    <section id="links" class="product-links-section">
+      <h2>Happy ColorPad</h2>
       <nav class="product-nav" aria-label="Happy ColorPad links">
         <a aria-current="page" href="/colorpad/">Product</a>
         <a href="/colorpad/support/">Support</a>
