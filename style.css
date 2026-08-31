@@ -1007,6 +1007,10 @@ body > footer:not(.brand-footer) p {
     line-height: 1;
   }
 
+  .section-statement {
+    letter-spacing: -0.035em;
+  }
+
   .product-hero-visual > p {
     right: 0;
     bottom: -1.7rem;
