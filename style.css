@@ -526,9 +526,9 @@ body > footer:not(.brand-footer) p {
 .product-page {
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 5% 8%, rgba(244, 201, 93, 0.2), transparent 22rem),
-    radial-gradient(circle at 98% 15%, rgba(121, 201, 211, 0.2), transparent 28rem),
-    var(--paper);
+    radial-gradient(circle at 5% 8%, rgba(244, 201, 93, 0.24), transparent 24rem),
+    radial-gradient(circle at 98% 15%, rgba(244, 124, 98, 0.14), transparent 30rem),
+    #fffaf1;
 }
 
 .product-shell {
