@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 import time
 from urllib.error import HTTPError, URLError
@@ -10,11 +11,14 @@ from urllib.request import Request, urlopen
 
 
 CRITICAL_URLS = {
-    "ColorPad TestFlight beta": {
-        "url": "https://testflight.apple.com/join/a78YM2ew",
-        "required_markers": ("Happy ColorPad", "beta"),
+    "Happy ColorPad App Store": {
+        "url": "https://apps.apple.com/us/app/happy-colorpad/id6768400422",
+        "required_markers": ("App Store",),
     },
 }
+APP_ID = 6768400422
+APP_NAME = "Happy ColorPad"
+APP_LOOKUP_URL = f"https://itunes.apple.com/lookup?id={APP_ID}&country=us"
 ATTEMPTS = 3
 TIMEOUT_SECONDS = 15
 MAX_RESPONSE_BYTES = 128 * 1024
@@ -67,6 +71,47 @@ def check_url(name: str, url: str, required_markers: tuple[str, ...]) -> str | N
     return f"{name} ({url}) failed after {ATTEMPTS} attempts: {last_error}"
 
 
+def check_app_store_listing() -> str | None:
+    request = Request(
+        APP_LOOKUP_URL,
+        headers={
+            "User-Agent": "SinbadLabs-LinkCheck/1.0",
+            "Accept": "application/json",
+        },
+    )
+    last_error = "unknown error"
+    for attempt in range(1, ATTEMPTS + 1):
+        try:
+            with urlopen(request, timeout=TIMEOUT_SECONDS) as response:
+                payload = json.load(response)
+                listing = next(
+                    (
+                        result
+                        for result in payload.get("results", [])
+                        if result.get("trackId") == APP_ID
+                        and result.get("trackName") == APP_NAME
+                    ),
+                    None,
+                )
+                if listing is not None:
+                    print(
+                        f"OK: Apple Lookup returned {APP_NAME} "
+                        f"with App ID {APP_ID}"
+                    )
+                    return None
+                last_error = (
+                    f"expected {APP_NAME} with App ID {APP_ID}; "
+                    f"received {payload.get('resultCount', 0)} result(s)"
+                )
+        except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as error:
+            last_error = str(error)
+
+        if attempt < ATTEMPTS:
+            time.sleep(attempt)
+
+    return f"Apple Lookup ({APP_LOOKUP_URL}) failed: {last_error}"
+
+
 def main() -> int:
     failures = [
         failure
@@ -80,6 +125,8 @@ def main() -> int:
         )
         is not None
     ]
+    if listing_failure := check_app_store_listing():
+        failures.append(listing_failure)
     if failures:
         print("Critical external link validation failed:")
         for failure in failures:
