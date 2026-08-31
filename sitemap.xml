@@ -2,22 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://sinbadlabs.com/</loc>
-    <lastmod>2026-08-04</lastmod>
+    <lastmod>2026-08-31</lastmod>
+  </url>
+  <url>
+    <loc>https://sinbadlabs.com/about/</loc>
+    <lastmod>2026-08-31</lastmod>
   </url>
   <url>
     <loc>https://sinbadlabs.com/colorpad/</loc>
-    <lastmod>2026-08-04</lastmod>
+    <lastmod>2026-08-31</lastmod>
   </url>
   <url>
     <loc>https://sinbadlabs.com/colorpad/support/</loc>
-    <lastmod>2026-08-04</lastmod>
+    <lastmod>2026-08-31</lastmod>
   </url>
   <url>
     <loc>https://sinbadlabs.com/colorpad/privacy/</loc>
-    <lastmod>2026-08-04</lastmod>
+    <lastmod>2026-08-31</lastmod>
   </url>
   <url>
     <loc>https://sinbadlabs.com/colorpad/terms/</loc>
-    <lastmod>2026-08-04</lastmod>
+    <lastmod>2026-08-31</lastmod>
   </url>
 </urlset>

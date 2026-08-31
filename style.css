@@ -731,6 +731,53 @@ body > footer:not(.brand-footer) p {
   line-height: 1.55;
 }
 
+.facts-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 0.75fr);
+  gap: clamp(3rem, 9vw, 9rem);
+  margin-bottom: clamp(2.5rem, 6vw, 5rem);
+}
+
+.facts-intro > p:last-child {
+  align-self: end;
+  max-width: 30rem;
+  color: var(--muted);
+}
+
+.fact-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+}
+
+.fact-item {
+  padding: clamp(1.5rem, 3vw, 2.3rem) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.fact-item:nth-child(odd) {
+  padding-right: clamp(1.5rem, 4vw, 4rem);
+  border-right: 1px solid var(--line);
+}
+
+.fact-item:nth-child(even) {
+  padding-left: clamp(1.5rem, 4vw, 4rem);
+}
+
+.fact-item h3 {
+  margin: 0 0 0.55rem;
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.fact-item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
 .screenshot-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -754,6 +801,31 @@ body > footer:not(.brand-footer) p {
   border-radius: clamp(1.2rem, 3vw, 2rem);
   background: var(--cream);
   box-shadow: 0 1.4rem 3.5rem rgba(76, 67, 50, 0.1);
+}
+
+.screenshot-crop {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: clamp(1.2rem, 3vw, 2rem);
+  background: var(--cream);
+  box-shadow: 0 1.4rem 3.5rem rgba(76, 67, 50, 0.1);
+}
+
+.screenshot-crop .screenshot-image {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.screenshot-crop-gallery {
+  aspect-ratio: 2360 / 1530;
+}
+
+.screenshot-crop-gallery .screenshot-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
 }
 
 .screenshot-grid figure:not(.screenshot-main):last-child {
@@ -855,6 +927,7 @@ body > footer:not(.brand-footer) p {
   .approach-grid,
   .services-grid,
   .intro-grid,
+  .facts-intro,
   .family-panel {
     grid-template-columns: 1fr;
   }
@@ -940,8 +1013,16 @@ body > footer:not(.brand-footer) p {
   }
 
   .feature-list,
+  .fact-list,
   .screenshot-grid {
     grid-template-columns: 1fr;
+  }
+
+  .fact-item:nth-child(odd),
+  .fact-item:nth-child(even) {
+    padding-right: 0;
+    padding-left: 0;
+    border-right: 0;
   }
 
   .feature-card {
