@@ -1,0 +1,19 @@
+{
+  "name": "sinbadlabs-app-store-redirect",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "check": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "test": "node --test test/*.test.js"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260916.1",
+    "wrangler": "4.132.0"
+  }
+}

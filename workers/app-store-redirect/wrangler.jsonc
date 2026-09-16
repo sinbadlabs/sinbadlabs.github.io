@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sinbadlabs-app-store-redirect",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "apps.sinbadlabs.com",
+      "custom_domain": true
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

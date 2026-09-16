@@ -102,7 +102,11 @@ def visible_text(parser: PageParser) -> str:
 
 
 def main() -> int:
-    pages = sorted(ROOT.rglob("*.html"))
+    pages = sorted(
+        path
+        for path in ROOT.rglob("*.html")
+        if "node_modules" not in path.relative_to(ROOT).parts
+    )
     parsed_pages = {page.resolve(): parse_page(page) for page in pages}
     errors: list[str] = []
 

@@ -13,5 +13,20 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: workers/app-store-redirect/package-lock.json
       - name: Validate local links and HTML structure
         run: python3 scripts/check_links.py
+      - name: Install App Store redirect worker dependencies
+        run: npm ci
+        working-directory: workers/app-store-redirect
+      - name: Test App Store redirect worker
+        run: npm test
+        working-directory: workers/app-store-redirect
+      - name: Validate App Store redirect worker bundle
+        run: npm run check
+        working-directory: workers/app-store-redirect
