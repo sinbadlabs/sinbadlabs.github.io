@@ -5,17 +5,58 @@ from __future__ import annotations
 
 import re
 import sys
+from collections import Counter
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlparse
+from xml.etree import ElementTree
 
 
 ROOT = Path(__file__).resolve().parent.parent
+SITE_ORIGIN = "https://sinbadlabs.com"
 EXTERNAL_SCHEMES = {"http", "https", "mailto", "tel"}
 LEGAL_DUPLICATES = {
     ROOT / "privacy/colorpad.html": ROOT / "colorpad/privacy/index.html",
     ROOT / "terms/colorpad.html": ROOT / "colorpad/terms/index.html",
 }
+PRODUCT = ROOT / "colorpad/index.html"
+SUPPORT = ROOT / "colorpad/support/index.html"
+GUIDES = ROOT / "colorpad/guides"
+GUIDE_INDEX = GUIDES / "index.html"
+IMPORT_GUIDE = GUIDES / "color-your-own-coloring-pages-on-ipad/index.html"
+FOCUS_GUIDE = GUIDES / "make-the-main-subject-stand-out/index.html"
+GUIDE_IMAGES = GUIDES / "images"
+BUNNY_PRACTICE_PNG = GUIDE_IMAGES / "bunny-coloring-page.png"
+SKY_COMPARISON_IMAGES = ("bunny-medium-sky.webp", "bunny-light-sky.webp")
+REQUIRED_GUIDE_IMAGES = {
+    IMPORT_GUIDE: {
+        None: (
+            "bunny-coloring-page.webp",
+            "ipad-bunny-canvas.webp",
+            "ipad-photos-picker.webp",
+            "ipad-bunny-saved.webp",
+        ),
+    },
+    FOCUS_GUIDE: {
+        "compare": SKY_COMPARISON_IMAGES,
+        "check-values": SKY_COMPARISON_IMAGES,
+        None: ("ipad-bunny-light-sky.webp",),
+    },
+}
+REQUIRED_GUIDE_DOWNLOADS = {
+    IMPORT_GUIDE: BUNNY_PRACTICE_PNG,
+    FOCUS_GUIDE: BUNNY_PRACTICE_PNG,
+}
+REQUIRED_GUIDE_LINKS = {
+    (PRODUCT, "coloring-guides"): (IMPORT_GUIDE, FOCUS_GUIDE),
+    (PRODUCT, "import-your-own-pictures"): (IMPORT_GUIDE,),
+    (PRODUCT, "links"): (GUIDE_INDEX,),
+    (SUPPORT, "import-a-coloring-page"): (IMPORT_GUIDE,),
+    (GUIDE_INDEX, None): (IMPORT_GUIDE, FOCUS_GUIDE, PRODUCT, SUPPORT),
+    (IMPORT_GUIDE, None): (GUIDE_INDEX, FOCUS_GUIDE, PRODUCT, SUPPORT),
+    (FOCUS_GUIDE, None): (GUIDE_INDEX, IMPORT_GUIDE, PRODUCT, SUPPORT),
+}
+CONTENT_CONTAINERS = {"article", "nav", "section"}
 
 
 class PageParser(HTMLParser):
@@ -24,24 +65,32 @@ class PageParser(HTMLParser):
         self.references: list[str] = []
         self.ids: set[str] = set()
         self.h1_count = 0
-        self.has_title = False
+        self.in_title = False
+        self.title_parts: list[str] = []
         self.has_viewport = False
         self.language: str | None = None
         self.text_parts: list[str] = []
-        self.canonical_url: str | None = None
+        self.canonical_urls: list[str | None] = []
         self.meta_description: str | None = None
         self.navigation_links: list[str] = []
+        self.download_links: list[str] = []
+        self.links_by_container: dict[str, list[str]] = {}
+        self.containers: list[tuple[str, str | None]] = []
+        self.images: list[tuple[str | None, str | None]] = []
+        self.image_sources_by_container: dict[str, list[str]] = {}
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         attributes = dict(attrs)
         element_id = attributes.get("id")
         if element_id:
             self.ids.add(element_id)
+        if tag in CONTENT_CONTAINERS:
+            self.containers.append((tag, element_id))
 
         if tag == "html":
             self.language = attributes.get("lang")
         elif tag == "title":
-            self.has_title = True
+            self.in_title = True
         elif tag == "h1":
             self.h1_count += 1
         elif tag == "meta":
@@ -58,16 +107,37 @@ class PageParser(HTMLParser):
         if tag == "link":
             relationships = set(attributes.get("rel", "").lower().split())
             if "canonical" in relationships:
-                self.canonical_url = attributes.get("href")
+                self.canonical_urls.append(attributes.get("href"))
         elif tag == "a" and attributes.get("href"):
-            self.navigation_links.append(attributes["href"])
+            href = attributes["href"]
+            self.navigation_links.append(href)
+            if "download" in attributes:
+                self.download_links.append(href)
+            for _, container_id in self.containers:
+                if container_id:
+                    self.links_by_container.setdefault(container_id, []).append(href)
+        elif tag == "img":
+            src = attributes.get("src")
+            self.images.append((src, attributes.get("alt")))
+            if src:
+                for _, container_id in self.containers:
+                    if container_id:
+                        self.image_sources_by_container.setdefault(container_id, []).append(src)
 
         for attribute in ("href", "src"):
             value = attributes.get(attribute)
             if value:
                 self.references.append(value)
 
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "title":
+            self.in_title = False
+        if self.containers and self.containers[-1][0] == tag:
+            self.containers.pop()
+
     def handle_data(self, data: str) -> None:
+        if self.in_title:
+            self.title_parts.append(data)
         text = data.strip()
         if text:
             self.text_parts.append(text)
@@ -101,6 +171,83 @@ def visible_text(parser: PageParser) -> str:
     return " ".join(" ".join(parser.text_parts).split())
 
 
+def validate_guides(parsed_pages: dict[Path, PageParser], errors: list[str]) -> None:
+    try:
+        sitemap = ElementTree.parse(ROOT / "sitemap.xml")
+        sitemap_urls = Counter(
+            loc.text for loc in sitemap.findall("{*}url/{*}loc")
+        )
+    except (OSError, ElementTree.ParseError) as error:
+        errors.append(f"sitemap.xml: {error}")
+        sitemap_urls = Counter()
+
+    titles: set[str] = set()
+    descriptions: set[str] = set()
+    for page, parser in parsed_pages.items():
+        if GUIDES not in page.parents:
+            continue
+        label = page.relative_to(ROOT)
+        url_path = f"{label.parent}/" if page.name == "index.html" else str(label)
+        expected_url = f"{SITE_ORIGIN}/{url_path}"
+        if parser.canonical_urls != [expected_url]:
+            errors.append(f"{label}: expected one canonical URL matching {expected_url}")
+        if sitemap_urls[expected_url] != 1:
+            errors.append(f"sitemap.xml: expected one entry for {expected_url}")
+
+        title = " ".join("".join(parser.title_parts).split()).casefold()
+        description = " ".join((parser.meta_description or "").split()).casefold()
+        if title in titles:
+            errors.append(f"{label}: guide title must be unique")
+        if not description or description in descriptions:
+            errors.append(f"{label}: guide meta description must be nonempty and unique")
+        titles.add(title)
+        descriptions.add(description)
+
+        # The guide illustrations are part of the instructions.
+        for src, alt in parser.images:
+            if not alt or not alt.strip():
+                errors.append(f"{label}: image {src!r} needs descriptive alt text")
+
+        for container, filenames in REQUIRED_GUIDE_IMAGES.get(page, {}).items():
+            sources = (
+                parser.image_sources_by_container.get(container, [])
+                if container
+                else [src for src, _ in parser.images if src]
+            )
+            image_targets = {
+                resolved[0]
+                for src in sources
+                if (resolved := local_target(page, src))
+            }
+            location = f"{label}#{container}" if container else str(label)
+            for filename in filenames:
+                if GUIDE_IMAGES / filename not in image_targets:
+                    errors.append(f"{location}: missing required image {filename}")
+
+        required_download = REQUIRED_GUIDE_DOWNLOADS.get(page)
+        if required_download is not None:
+            download_targets = {
+                resolved[0] for href in parser.download_links if (resolved := local_target(page, href))
+            }
+            if required_download not in download_targets:
+                errors.append(f"{label}: missing download link for {required_download.name}")
+
+    for (source, container), targets in REQUIRED_GUIDE_LINKS.items():
+        parser = parsed_pages.get(source)
+        label = source.relative_to(ROOT)
+        if parser is None:
+            errors.append(f"{label}: missing page with required guide links")
+            continue
+        links = parser.links_by_container.get(container, []) if container else parser.navigation_links
+        destinations = {
+            resolved[0] for link in links if (resolved := local_target(source, link))
+        }
+        location = f"{label}#{container}" if container else str(label)
+        for target in targets:
+            if target not in destinations:
+                errors.append(f"{location}: missing link to {target.relative_to(ROOT)}")
+
+
 def main() -> int:
     pages = sorted(
         path
@@ -114,7 +261,7 @@ def main() -> int:
         label = page.relative_to(ROOT)
         if not parser.language:
             errors.append(f"{label}: missing html lang attribute")
-        if not parser.has_title:
+        if not "".join(parser.title_parts).strip():
             errors.append(f"{label}: missing title")
         if not parser.has_viewport:
             errors.append(f"{label}: missing viewport meta tag")
@@ -146,8 +293,8 @@ def main() -> int:
                     visible_text(canonical_parser),
                 ),
                 "canonical URL": (
-                    legacy_parser.canonical_url,
-                    canonical_parser.canonical_url,
+                    legacy_parser.canonical_urls,
+                    canonical_parser.canonical_urls,
                 ),
                 "meta description": (
                     legacy_parser.meta_description,
@@ -165,13 +312,15 @@ def main() -> int:
                         f"{canonical.relative_to(ROOT)}"
                     )
 
+    validate_guides(parsed_pages, errors)
+
     if errors:
         print("Site validation failed:")
         for error in errors:
             print(f"- {error}")
         return 1
 
-    print(f"Validated {len(pages)} HTML pages: local links and structure are OK.")
+    print(f"Validated {len(pages)} HTML pages: links, structure, and guide checks are OK.")
     return 0
 
 
