@@ -1,36 +1,22 @@
+---
+layout: null
+---
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{%- assign pages = site.static_files | where: "extname", ".html" | where_exp: "file", "file.sitemap != false" %}
+{%- assign paths = pages | map: "path" %}
+{%- for page in site.html_pages %}
+  {%- assign extension = page.name | split: "." | last %}
+  {%- if extension == "html" and page.sitemap != false %}
+    {%- assign paths = paths | push: page.url %}
+  {%- endif %}
+{%- endfor %}
+{%- assign paths = paths | sort %}
+{%- for path in paths %}
+  {%- unless path == "/404.html" or path == "/privacy/colorpad.html" or path == "/terms/colorpad.html" %}
   <url>
-    <loc>https://sinbadlabs.com/</loc>
-    <lastmod>2026-08-31</lastmod>
+    <loc>{{ path | replace: "/index.html", "/" | absolute_url | xml_escape }}</loc>
   </url>
-  <url>
-    <loc>https://sinbadlabs.com/about/</loc>
-    <lastmod>2026-08-31</lastmod>
-  </url>
-  <url>
-    <loc>https://sinbadlabs.com/colorpad/</loc>
-    <lastmod>2026-08-31</lastmod>
-  </url>
-  <url>
-    <loc>https://sinbadlabs.com/colorpad/support/</loc>
-    <lastmod>2026-08-31</lastmod>
-  </url>
-  <url>
-    <loc>https://sinbadlabs.com/colorpad/guides/</loc>
-  </url>
-  <url>
-    <loc>https://sinbadlabs.com/colorpad/guides/color-your-own-coloring-pages-on-ipad/</loc>
-  </url>
-  <url>
-    <loc>https://sinbadlabs.com/colorpad/guides/make-the-main-subject-stand-out/</loc>
-  </url>
-  <url>
-    <loc>https://sinbadlabs.com/colorpad/privacy/</loc>
-    <lastmod>2026-08-31</lastmod>
-  </url>
-  <url>
-    <loc>https://sinbadlabs.com/colorpad/terms/</loc>
-    <lastmod>2026-08-31</lastmod>
-  </url>
+  {%- endunless %}
+{%- endfor %}
 </urlset>

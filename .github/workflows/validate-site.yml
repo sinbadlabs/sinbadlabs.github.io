@@ -13,14 +13,16 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Build the site with GitHub Pages Jekyll
+        uses: actions/jekyll-build-pages@v1
+      - name: Validate local links, HTML structure, ColorPad guides, and the built sitemap
+        run: python3 scripts/check_links.py --sitemap _site/sitemap.xml
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: workers/app-store-redirect/package-lock.json
-      - name: Validate local links, HTML structure, and ColorPad guides
-        run: python3 scripts/check_links.py
       - name: Install App Store redirect worker dependencies
         run: npm ci
         working-directory: workers/app-store-redirect

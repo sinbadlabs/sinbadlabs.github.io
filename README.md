@@ -2,6 +2,12 @@
 
 Static website for [sinbadlabs.com](https://sinbadlabs.com), hosted by GitHub Pages.
 
+GitHub Pages generates `/sitemap.xml` from the site's HTML files during its
+Jekyll build. Add new tutorials under `colorpad/guides/` and link them from the
+guide directory. CI checks the generated sitemap against the indexable canonical
+URLs. For a page with a `noindex` directive, set `sitemap: false` in its YAML
+front matter to keep its URL out of the sitemap.
+
 ## App Store redirects
 
 App Store calls to action use `https://apps.sinbadlabs.com/colorpad`. The

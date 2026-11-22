@@ -5,7 +5,9 @@ from __future__ import annotations
 
 import re
 import sys
+from argparse import ArgumentParser
 from collections import Counter
+from collections.abc import Iterator
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlparse
@@ -14,7 +16,8 @@ from xml.etree import ElementTree
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE_ORIGIN = "https://sinbadlabs.com"
-EXTERNAL_SCHEMES = {"http", "https", "mailto", "tel"}
+SITEMAP_NAMESPACE = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+EXTERNAL_SCHEMES = {"data", "http", "https", "mailto", "tel"}
 LEGAL_DUPLICATES = {
     ROOT / "privacy/colorpad.html": ROOT / "colorpad/privacy/index.html",
     ROOT / "terms/colorpad.html": ROOT / "colorpad/terms/index.html",
@@ -59,6 +62,21 @@ REQUIRED_GUIDE_LINKS = {
 CONTENT_CONTAINERS = {"article", "nav", "section"}
 
 
+def srcset_urls(value: str) -> Iterator[str]:
+    """Read URLs and skip optional width or density descriptors."""
+    separators = " \t\n\f\r,"
+    remaining = value.lstrip(separators)
+    while remaining:
+        tokens = re.split(r"[ \t\n\f\r]+", remaining, maxsplit=1)
+        url = tokens[0]
+        # A comma inside the URL is part of the URL. A trailing comma ends the candidate.
+        yield url.rstrip(",")
+        remaining = tokens[1] if len(tokens) == 2 else ""
+        if not url.endswith(","):
+            remaining = remaining.partition(",")[2]
+        remaining = remaining.lstrip(separators)
+
+
 class PageParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
@@ -71,6 +89,7 @@ class PageParser(HTMLParser):
         self.language: str | None = None
         self.text_parts: list[str] = []
         self.canonical_urls: list[str | None] = []
+        self.blocks_indexing = False
         self.meta_description: str | None = None
         self.navigation_links: list[str] = []
         self.download_links: list[str] = []
@@ -94,10 +113,15 @@ class PageParser(HTMLParser):
         elif tag == "h1":
             self.h1_count += 1
         elif tag == "meta":
-            if attributes.get("name", "").lower() == "viewport":
+            name = (attributes.get("name") or "").strip().lower()
+            if name == "viewport":
                 self.has_viewport = True
-            if attributes.get("name", "").lower() == "description":
+            elif name == "description":
                 self.meta_description = attributes.get("content")
+            elif name in {"robots", "googlebot"}:
+                directives = re.split(r"[\s,]+", (attributes.get("content") or "").lower())
+                if {"noindex", "none"}.intersection(directives):
+                    self.blocks_indexing = True
             if attributes.get("http-equiv", "").lower() == "refresh":
                 content = attributes.get("content", "")
                 match = re.search(r"url\s*=\s*([^;]+)", content, re.IGNORECASE)
@@ -128,6 +152,9 @@ class PageParser(HTMLParser):
             value = attributes.get(attribute)
             if value:
                 self.references.append(value)
+
+        if tag in {"img", "source"} and (srcset := attributes.get("srcset")):
+            self.references.extend(srcset_urls(srcset))
 
     def handle_endtag(self, tag: str) -> None:
         if tag == "title":
@@ -171,29 +198,57 @@ def visible_text(parser: PageParser) -> str:
     return " ".join(" ".join(parser.text_parts).split())
 
 
-def validate_guides(parsed_pages: dict[Path, PageParser], errors: list[str]) -> None:
-    try:
-        sitemap = ElementTree.parse(ROOT / "sitemap.xml")
-        sitemap_urls = Counter(
-            loc.text for loc in sitemap.findall("{*}url/{*}loc")
-        )
-    except (OSError, ElementTree.ParseError) as error:
-        errors.append(f"sitemap.xml: {error}")
-        sitemap_urls = Counter()
+def public_url(page: Path, site_root: Path) -> str:
+    path = page.relative_to(site_root).as_posix()
+    if page.name == "index.html":
+        path = path.removesuffix("index.html")
+    return f"{SITE_ORIGIN}/{path}"
 
+
+def validate_sitemap(path: Path, errors: list[str]) -> None:
+    try:
+        sitemap = ElementTree.parse(path).getroot()
+    except (OSError, ElementTree.ParseError) as error:
+        errors.append(f"{path}: {error}")
+        return
+
+    if sitemap.tag != f"{SITEMAP_NAMESPACE}urlset":
+        errors.append(f"{path}: expected a sitemap urlset")
+        return
+
+    sitemap_urls = Counter(
+        loc.text or "" for loc in sitemap.findall(f"{SITEMAP_NAMESPACE}url/{SITEMAP_NAMESPACE}loc")
+    )
+    canonical_urls = set()
+    noindex_urls = set()
+    site_root = path.parent
+    for page in site_root.rglob("*.html"):
+        url = public_url(page, site_root)
+        parser = parse_page(page)
+        if parser.blocks_indexing:
+            noindex_urls.add(url)
+        elif parser.canonical_urls == [url]:
+            canonical_urls.add(url)
+    for url in sorted(canonical_urls):
+        if sitemap_urls[url] != 1:
+            errors.append(f"{path}: expected one entry for {url}")
+    for url in sorted(sitemap_urls.keys() - canonical_urls):
+        if url in noindex_urls:
+            errors.append(f"{path}: exclude noindex URL {url} with sitemap: false in its front matter")
+        else:
+            errors.append(f"{path}: unexpected URL {url!r}")
+
+
+def validate_guides(parsed_pages: dict[Path, PageParser], errors: list[str]) -> None:
     titles: set[str] = set()
     descriptions: set[str] = set()
     for page, parser in parsed_pages.items():
         if GUIDES not in page.parents:
             continue
         label = page.relative_to(ROOT)
-        url_path = f"{label.parent}/" if page.name == "index.html" else str(label)
-        expected_url = f"{SITE_ORIGIN}/{url_path}"
+        expected_url = public_url(page, ROOT)
         if parser.canonical_urls != [expected_url]:
             errors.append(f"{label}: expected one canonical URL matching {expected_url}")
-        if sitemap_urls[expected_url] != 1:
-            errors.append(f"sitemap.xml: expected one entry for {expected_url}")
-
         title = " ".join("".join(parser.title_parts).split()).casefold()
         description = " ".join((parser.meta_description or "").split()).casefold()
         if title in titles:
@@ -249,10 +304,14 @@ def validate_guides(parsed_pages: dict[Path, PageParser], errors: list[str]) -> 
 
 
 def main() -> int:
+    arguments = ArgumentParser(description=__doc__)
+    arguments.add_argument("--sitemap", type=Path, help="Path to the built sitemap.xml")
+    args = arguments.parse_args()
+
     pages = sorted(
         path
         for path in ROOT.rglob("*.html")
-        if "node_modules" not in path.relative_to(ROOT).parts
+        if not {"node_modules", "_site"}.intersection(path.relative_to(ROOT).parts)
     )
     parsed_pages = {page.resolve(): parse_page(page) for page in pages}
     errors: list[str] = []
@@ -313,6 +372,8 @@ def main() -> int:
                     )
 
     validate_guides(parsed_pages, errors)
+    if args.sitemap is not None:
+        validate_sitemap(args.sitemap, errors)
 
     if errors:
         print("Site validation failed:")
