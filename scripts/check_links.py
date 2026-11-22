@@ -10,13 +10,15 @@ from collections import Counter
 from collections.abc import Iterator
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from unicodedata import normalize
+from urllib.parse import quote, unquote, urlparse
 from xml.etree import ElementTree
 
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE_ORIGIN = "https://sinbadlabs.com"
 SITEMAP_NAMESPACE = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+URL_PATH_DELIMITERS = "/!$&'()*+,;=:@"
 EXTERNAL_SCHEMES = {"data", "http", "https", "mailto", "tel"}
 LEGAL_DUPLICATES = {
     ROOT / "privacy/colorpad.html": ROOT / "colorpad/privacy/index.html",
@@ -202,7 +204,8 @@ def public_url(page: Path, site_root: Path) -> str:
     path = page.relative_to(site_root).as_posix()
     if page.name == "index.html":
         path = path.removesuffix("index.html")
-    return f"{SITE_ORIGIN}/{path}"
+    encoded_path = quote(normalize("NFC", path), safe=URL_PATH_DELIMITERS)
+    return f"{SITE_ORIGIN}/{encoded_path}"
 
 
 def validate_sitemap(path: Path, errors: list[str]) -> None:
