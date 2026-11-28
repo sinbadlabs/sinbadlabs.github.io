@@ -58,71 +58,37 @@
     <header class="brand-hero">
       <h1>Sinbad Labs</h1>
       <p class="brand-intro">An independent software studio.</p>
-      <a class="text-link" href="/colorpad/">Explore Happy ColorPad</a>
     </header>
 
-    <section id="products" class="brand-section product-showcase">
-      <div class="section-label">
-        <h2>Our first product</h2>
-      </div>
-      <article class="product-spotlight">
-        <div class="product-spotlight-copy">
-          <p class="eyebrow">For iPhone &amp; iPad</p>
-          <h3>Happy ColorPad</h3>
-          <p class="product-tagline">A quiet place to color.</p>
-          <p class="product-summary">
-            Choose from 190+ hand-drawn pages, use familiar coloring tools, or bring
-            in line art from Photos—all without ads.
-          </p>
-          <div class="button-row">
-            <a class="primary-cta" href="/colorpad/">Explore the app <span aria-hidden="true">→</span></a>
-            <a class="text-link" href="https://apps.sinbadlabs.com/colorpad">View on the App Store</a>
-          </div>
-        </div>
-        <div class="product-spotlight-visual">
-          <span class="color-dot color-dot-coral" aria-hidden="true"></span>
-          <span class="color-dot color-dot-blue" aria-hidden="true"></span>
-          <img
-            src="/colorpad/screenshots/hero.webp"
-            alt="Happy ColorPad gallery with coloring pages and a recently finished picture."
-            width="2360"
-            height="1640"
-          >
-        </div>
-      </article>
-    </section>
-
-    <section id="what-we-build" class="brand-section approach-section">
-      <div class="section-label">
-        <h2>How we work</h2>
-      </div>
-      <p class="approach-copy">We start with what people want to do and keep the steps simple.</p>
-    </section>
-
-    <section id="services" class="brand-section services-section">
-      <div class="section-label">
-        <h2>Product development</h2>
-      </div>
-      <div class="services-grid">
-        <p class="services-statement">From promising idea to focused first version.</p>
-        <div class="services-copy">
-          <p>
-            We work with solo founders and small teams to clarify the core value,
-            define a practical MVP, and build a product ready to test with real users.
-          </p>
-          <a class="text-link" href="mailto:hello@sinbadlabs.com?subject=Product%20Development">Start a conversation <span aria-hidden="true">→</span></a>
+    <section id="products" class="product-spotlight" aria-labelledby="product-title">
+      <div>
+        <h2 id="product-title">Happy ColorPad</h2>
+        <p class="product-summary">
+          Color right on your iPad or iPhone. No printing needed.
+          Choose a page or import your own line art, all without ads.
+        </p>
+        <div class="button-row">
+          <a class="primary-cta" href="/colorpad/">Explore the app <span aria-hidden="true">→</span></a>
+          <a class="text-link" href="https://apps.sinbadlabs.com/colorpad">View on the App Store</a>
         </div>
       </div>
-    </section>
-
-    <section id="contact" class="brand-section contact-panel">
-      <h2>Get in touch</h2>
-      <a class="contact-link" href="mailto:hello@sinbadlabs.com">hello@sinbadlabs.com <span aria-hidden="true">↗</span></a>
+      <img
+        class="product-spotlight-image"
+        src="/colorpad/screenshots/hero.webp"
+        alt="Happy ColorPad gallery with coloring pages and a recently finished picture."
+        width="2360"
+        height="1640"
+        fetchpriority="high"
+      >
     </section>
   </main>
 
-  <footer class="brand-footer">
-    <p><strong>Sinbad Labs</strong><span><a href="/about/">About</a> · &copy; 2026</span></p>
+  <footer id="contact" class="brand-footer">
+    <div>
+      <h2>Contact</h2>
+      <a class="text-link" href="mailto:hello@sinbadlabs.com">hello@sinbadlabs.com</a>
+    </div>
+    <p>&copy; 2026 Sinbad Labs</p>
   </footer>
 </body>
 </html>
